@@ -6,3 +6,7 @@ require (
 	github.com/onsi/ginkgo v1.10.3
 	github.com/onsi/gomega v1.7.1
 )
+
+replace (
+	github.com/vpashka/go-bitcoind => github.com/tiehm/go-bitcoind latest
+)
