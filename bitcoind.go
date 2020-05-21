@@ -90,6 +90,15 @@ func (b *Bitcoind) GetAddressesByAccount(account string) (addresses []string, er
 	return
 }
 
+// GetAddressInfo return error if address wasnt found
+func (b *Bitcoind) GetAddressInfo(address string) (err error) {
+	r, err := b.client.call("getaddressinfo", []string{address})
+	if err = handleError(err, &r); err != nil {
+		return
+	}
+	return
+}
+
 // GetBalance return the balance of the server or of a specific account
 //If [account] is "", returns the server's total available balance.
 //If [account] is specified, returns the balance in the account
