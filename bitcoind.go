@@ -4,6 +4,7 @@ package bitcoind
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -667,6 +668,28 @@ func (b *Bitcoind) Move(formAccount, toAccount string, amount float64, minconf u
 	err = json.Unmarshal(r.Result, &success)
 	return
 
+}
+
+type unspents struct {
+	Txid         string
+	Vout         int
+	ScriptPubKey string
+	Desc         string
+	Amount       float64
+	height       int
+}
+type ScanTXOutSetResult struct {
+	TotalAmount float64    `json:"total_amount"`
+	Unspents    []unspents `json:"unspents"`
+}
+
+func (b *Bitcoind) ScanTXOutSet(address string) (result ScanTXOutSetResult, err error) {
+	r, err := b.client.call("scantxoutset", []interface{}{"start", true, fmt.Sprintf("[\"addr(%s)\"]", address)})
+	if err = handleError(err, &r); err != nil {
+		return
+	}
+	err = json.Unmarshal(r.Result, &result)
+	return
 }
 
 // SendFrom send amount from fromAccount to toAddress
