@@ -744,6 +744,15 @@ func (b *Bitcoind) SendManyReplaceable(fromAccount string, amounts map[string]fl
 	return
 }
 
+func (b *Bitcoind) SendRawTransaction(hexString string) (hex string, err error) {
+	r, err := b.client.call("sendrawtransaction", []string{hexString})
+	if err = handleError(err, &r); err != nil {
+		return
+	}
+	err = json.Unmarshal(r.Result, &hex)
+	return
+}
+
 // SendToAddress send an amount to a given address
 func (b *Bitcoind) SendToAddress(toAddress string, amount float64, comment, commentTo string) (txID string, err error) {
 	r, err := b.client.call("sendtoaddress", []interface{}{toAddress, amount, comment, commentTo})
