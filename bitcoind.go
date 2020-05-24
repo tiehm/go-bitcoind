@@ -153,8 +153,8 @@ func (b *Bitcoind) GetBestBlockhash() (bestBlockHash string, err error) {
 }
 
 // GetBlock returns information about the block with the given hash.
-func (b *Bitcoind) GetBlock(blockHash string) (block Block, err error) {
-	r, err := b.client.call("getblock", []string{blockHash})
+func (b *Bitcoind) GetBlock(blockHash string, verbosity int) (block Block, err error) {
+	r, err := b.client.call("getblock", []interface{}{blockHash, verbosity})
 	if err = handleError(err, &r); err != nil {
 		return
 	}
