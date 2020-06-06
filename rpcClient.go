@@ -2,7 +2,6 @@ package bitcoind
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -56,24 +55,13 @@ type rpcResponse struct {
 	Err    *RPCError       `json:"error"`
 }
 
-func newClient(host string, port int, user, passwd string, useSSL bool, timeout int) (c *rpcClient, err error) {
+func newClient(host string, port int, user, passwd string, timeout int) (c *rpcClient, err error) {
 	if len(host) == 0 {
 		err = errors.New("Bad call missing argument host")
 		return
 	}
-	var serverAddr string
-	var httpClient *http.Client
-	if useSSL {
-		serverAddr = "https://"
-		t := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		httpClient = &http.Client{Transport: t}
-	} else {
-		serverAddr = "http://"
-		httpClient = &http.Client{}
-	}
-	c = &rpcClient{serverAddr: fmt.Sprintf("%s%s:%d", serverAddr, host, port), user: user, passwd: passwd, httpClient: httpClient, timeout: timeout}
+	httpClient := &http.Client{}
+	c = &rpcClient{serverAddr: fmt.Sprintf("%s:%d", host, port), user: user, passwd: passwd, httpClient: httpClient, timeout: timeout}
 	return
 }
 
@@ -107,7 +95,7 @@ func (c *rpcClient) call(method string, params interface{}) (rr rpcResponse, err
 	if err != nil {
 		return
 	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s:%s@%s", c.user, c.passwd, c.serverAddr), payloadBuffer)
+	req, err := http.NewRequest("POST", fmt.Sprintf("http://%s:%s@%s", c.user, c.passwd, c.serverAddr), payloadBuffer)
 	if err != nil {
 		return
 	}
